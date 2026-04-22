@@ -13,12 +13,22 @@ from langchain_cohere import ChatCohere
 # Load environment variables from .env file (for local runs)
 load_dotenv()
 
-# Helper function to get API key from either Streamlit Secrets or .env
+# Helper function to get API key safely without crashing
 def get_api_key():
-    if "COHERE_API_KEY" in st.secrets:
-        return st.secrets["COHERE_API_KEY"]
-    return os.getenv("COHERE_API_KEY")
-
+    # 1. Try to get it from environment variables first (this handles local .env)
+    api_key = os.getenv("COHERE_API_KEY")
+    if api_key:
+        return api_key
+        
+    # 2. Safely try Streamlit secrets if environment variable is missing
+    try:
+        if "COHERE_API_KEY" in st.secrets:
+            return st.secrets["COHERE_API_KEY"]
+    except Exception:
+        # If the secrets file is missing or broken, catch the error so the app doesn't crash
+        pass
+        
+    return None
 # --- Custom Premium Light Theme with Hover Effects & Study Background ---
 def apply_custom_css():
     st.markdown("""
