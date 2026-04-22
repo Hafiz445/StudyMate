@@ -10,8 +10,14 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_cohere import ChatCohere
 
-# Load environment variables from .env file
+# Load environment variables from .env file (for local runs)
 load_dotenv()
+
+# Helper function to get API key from either Streamlit Secrets or .env
+def get_api_key():
+    if "COHERE_API_KEY" in st.secrets:
+        return st.secrets["COHERE_API_KEY"]
+    return os.getenv("COHERE_API_KEY")
 
 # --- Custom Premium Light Theme with Hover Effects & Study Background ---
 def apply_custom_css():
@@ -220,11 +226,13 @@ def format_docs(docs):
 
 # --- Milestone 3: Cohere LLM Integration ---
 def get_cohere_llm():
-    # Initializes the CORRECT and ACTIVE Cohere Command R7B model
+    # Fetch key using our new robust helper function
+    api_key = get_api_key()
+    
     llm = ChatCohere(
         model="command-r7b-12-2024", 
         temperature=0.3, 
-        cohere_api_key=os.getenv("COHERE_API_KEY")
+        cohere_api_key=api_key
     )
     return llm
 
@@ -248,8 +256,9 @@ def main():
         pdf_docs = st.file_uploader("Drop PDFs Here", accept_multiple_files=True, type=['pdf'])
         
         if st.button("Process Documents 🚀"):
-            if not os.getenv("COHERE_API_KEY"):
-                st.error("Missing COHERE_API_KEY in .env file.")
+            # Check for API Key using the new helper
+            if not get_api_key():
+                st.error("Missing COHERE_API_KEY in Streamlit Secrets.")
             elif not pdf_docs:
                 st.warning("Please upload at least one PDF.")
             else:
