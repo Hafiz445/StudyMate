@@ -29,6 +29,7 @@ def get_api_key():
         pass
         
     return None
+
 # --- Custom Premium Light Theme with Hover Effects & Study Background ---
 def apply_custom_css():
     st.markdown("""
@@ -202,7 +203,7 @@ def apply_custom_css():
         </style>
         
         <div class="footer">
-            StudyMate v1.0 • Engineered with ❤️ by <span>Amna and Team</span>
+            StudyMate v1.0 • Engineered with ❤️ by <span>Hafiz and Team</span>
         </div>
     """, unsafe_allow_html=True)
 
